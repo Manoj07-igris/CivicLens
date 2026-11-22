@@ -100,3 +100,31 @@ All 16 phases of CivicLens AI have been fully implemented, hardened, verified, a
 - **Operational readiness on consumer hardware** (Windows 11, Intel i3, 8 GB RAM, CPU-only).
 
 **Status**: **OFFICIALLY RELEASED FOR HACKATHON EVALUATION** (`v1.0.0-hackathon`).
+
+---
+
+## 8. Public Publishing & Privacy Audit (v1.1.0-auth)
+
+CivicLens has been audited and published to GitHub (`https://github.com/Manoj07-igris/CivicLens.git`) with strict privacy and security enforcement:
+
+### Excluded from Version Control
+- **Secrets & API Keys**: `.env`, `.env.*` (only safe template `.env.example` is committed).
+- **Relational Databases & Data**: SQLite databases (`*.db`, `*.db-wal`, `*.sqlite`) and all dynamic runtime files in `backend/data/` (uploads, FAISS vector indexes, official source PDFs, grievance photos, comparisons, verifications, browser session logs).
+- **Runtime & Build Artifacts**: Python virtual environments (`backend/.venv/`), Node dependencies (`node_modules/`), compiled Vite production assets (`frontend/dist/`), Playwright test traces, and all runtime log files (`*.log`).
+- **Personal Data**: Author email masked using the official GitHub noreply privacy address (`Manoj07-igris@users.noreply.github.com`). Zero local Windows machine paths or personal identifiers committed.
+
+### Pre-Push Verification Workflow
+Before pushing future updates, always execute the built-in security scanner:
+```powershell
+# 1. Run scanner to verify zero secrets or prohibited files are staged
+python scripts\scan_secrets.py --staged
+
+# 2. Stage verified changes
+git add -A
+git status
+
+# 3. Commit and push cleanly
+git commit -m "Your update message"
+git push origin main
+```
+
