@@ -16,7 +16,7 @@ class Settings(BaseSettings):
   """Application configuration and environment settings."""
 
   APP_ENV: str = "development"
-  CORS_ORIGINS: str = "http://localhost:5173,http://127.0.0.1:5173,http://localhost:5174,http://127.0.0.1:5174"
+  CORS_ORIGINS: str = "http://localhost:5173,http://127.0.0.1:5173,http://localhost:5174,http://127.0.0.1:5174,https://civic-lens-liard.vercel.app"
   GEMINI_API_KEY: str = ""
   GEMINI_MODEL: str = DEFAULT_GEMINI_MODEL
   GEMINI_TIMEOUT_SECONDS: int = 30
@@ -120,7 +120,7 @@ class Settings(BaseSettings):
 
   # Phase 16 - Security Hardening, Quota Cap, and Serving Settings
   GEMINI_GLOBAL_RPM_CAP: int = 30
-  ALLOWED_HOSTS: str = "127.0.0.1,localhost,testserver"
+  ALLOWED_HOSTS: str = "127.0.0.1,localhost,testserver,*.onrender.com,*.vercel.app"
   ENABLE_API_DOCS: bool = False
   SERVE_FRONTEND: bool = False
 
