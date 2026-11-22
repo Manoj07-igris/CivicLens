@@ -1,0 +1,69 @@
+{
+  "version": "1.0.0-hackathon",
+  "project": "CivicLens AI",
+  "tagline": "Understand. Verify. Act.",
+  "bilingual_support": ["en", "ta"],
+  "scenarios": [
+    {
+      "id": "scenario_1_policy_qa",
+      "module": "Module 1: Policy Intelligence",
+      "title": "Tamil Nadu Magalir Urimai Thittam Income Ceiling Q&A",
+      "query_en": "What is the annual household income limit to qualify for the women's rights grant in Tamil Nadu?",
+      "query_ta": "கலைஞர் மகளிர் உரிமைத் திட்டத்திற்கு தகுதி பெற ஆண்டு குடும்ப வருமான வரம்பு என்ன?",
+      "expected_fact": "Rs. 3,00,000 (Rupees Three Lakh only)",
+      "target_document": "TN_Magalir_Urimai_2024.pdf",
+      "expected_page": 2
+    },
+    {
+      "id": "scenario_2_change_detection",
+      "module": "Module 2: Policy Change Detection",
+      "title": "Comparing 2023 vs 2024 Gazette Notifications",
+      "document_old": "TN_Magalir_Urimai_2023.pdf",
+      "document_new": "TN_Magalir_Urimai_2024.pdf",
+      "key_changes": [
+        "Financial entitlement raised from Rs. 1,000 to Rs. 1,200 per month",
+        "Family annual income ceiling raised from Rs. 2,50,000 to Rs. 3,00,000",
+        "New statutory appeal mechanism introduced before Revenue Divisional Officer (RDO)"
+      ]
+    },
+    {
+      "id": "scenario_3_fact_verification",
+      "module": "Module 3: Fact Verification",
+      "title": "Cross-Verifying Viral Social Media Claims",
+      "viral_claim": "The government has reduced the women's rights assistance to Rs 500.",
+      "expected_verdict": "REFUTED",
+      "confidence": 0.95,
+      "official_citation": "TN_Magalir_Urimai_2024.pdf (Page 1)"
+    },
+    {
+      "id": "scenario_4_public_services",
+      "module": "Module 4: Public Service Assistant",
+      "title": "Step-by-Step Guidance for Scheme Enrollment",
+      "service_query": "How to apply for Kalaignar Magalir Urimai Thittam in Chennai?",
+      "matched_portal_url": "https://esevai.tn.gov.in",
+      "required_documents": [
+        "Aadhaar Card with linked mobile number",
+        "Valid Family Ration Card (Smart Card)",
+        "Bank Passbook with active DBT linkage",
+        "Electricity Bill for consumption verification"
+      ]
+    },
+    {
+      "id": "scenario_5_grievance_redressal",
+      "module": "Module 5: Civic Grievance Assistant",
+      "title": "Complaint Filing for Water Supply Interruption",
+      "complaint_input": "Continuous contaminated sewage water mixing with drinking supply in Anna Nagar Ward 104.",
+      "classified_department": "Water Supply & Sewerage Board (CMWSSB)",
+      "safety_severity": "High",
+      "pii_redaction_active": true
+    },
+    {
+      "id": "scenario_6_browser_demo",
+      "module": "Playwright Browser Automation",
+      "title": "Controlled Demo Portal Auto-Fill & Submission",
+      "target_portal": "http://127.0.0.1:8000/demo-portal",
+      "workflow_steps": 5,
+      "requires_human_approval": true
+    }
+  ]
+}

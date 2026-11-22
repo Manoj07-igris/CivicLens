@@ -1,0 +1,44 @@
+@import "tailwindcss";
+
+@import "@fontsource/inter/index.css";
+@import "@fontsource/noto-sans-tamil/index.css";
+
+@theme {
+  --font-sans: 'Inter', 'Noto Sans Tamil', system-ui, -apple-system, sans-serif;
+  --font-tamil: 'Noto Sans Tamil', 'Inter', system-ui, -apple-system, sans-serif;
+
+  --color-civic-50: #eff6ff;
+  --color-civic-100: #dbeafe;
+  --color-civic-200: #bfdbfe;
+  --color-civic-300: #93c5fd;
+  --color-civic-400: #60a5fa;
+  --color-civic-500: #2563eb;
+  --color-civic-600: #1d4ed8;
+  --color-civic-700: #1e40af;
+  --color-civic-800: #1e3a8a;
+  --color-civic-900: #172554;
+}
+
+:root {
+  font-family: var(--font-sans);
+  color-scheme: light;
+}
+
+html[lang="ta"] {
+  font-family: var(--font-tamil);
+  line-height: 1.65;
+}
+
+body {
+  margin: 0;
+  background-color: #f8fafc;
+  color: #0f172a;
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Accessible focus ring utility */
+:focus-visible {
+  outline: 2px solid #2563eb;
+  outline-offset: 2px;
+}

@@ -1,0 +1,48 @@
+# Core lightweight web framework for CivicLens API
+fastapi>=0.110.0
+
+# ASGI server for running FastAPI applications
+uvicorn[standard]>=0.28.0
+
+# Data validation and settings management using Python type annotations
+pydantic>=2.6.0
+
+# Settings management from environment variables and .env files for Pydantic v2
+pydantic-settings>=2.2.0
+
+# Reads key-value pairs from .env file and sets them as environment variables
+python-dotenv>=1.0.1
+
+# Required by FastAPI for handling multipart/form-data (file uploads in later phases)
+python-multipart>=0.0.9
+
+# Official Google Gen AI SDK for Gemini models (replaces deprecated google-generativeai)
+google-genai>=2.0.0
+
+# High-performance PDF parsing, text extraction, and page rendering
+pymupdf>=1.24.0
+
+# Image manipulation and page rendering for OCR fallback
+pillow>=10.0.0
+
+# Python wrapper for Google's Tesseract-OCR Engine (optional local OCR)
+pytesseract>=0.3.10
+
+# Lightweight ONNX-based embedding engine for CPU execution without heavy PyTorch dependencies
+fastembed>=0.9.0
+
+# Exact vector index and fast cosine similarity search on CPU
+faiss-cpu>=1.10.0
+
+# Numerical computations and vector array manipulation
+numpy>=1.26.0
+
+# Playwright browser automation (controlled demo workflow for citizen education)
+playwright>=1.40.0
+
+# Password hashing with Argon2id for secure citizen authentication
+argon2-cffi==25.1.0
+
+# Robust email normalization and syntax validation
+email-validator==2.4.0
+

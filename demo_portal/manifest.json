@@ -1,0 +1,264 @@
+{
+  "workflow_id": "demo_income_certificate",
+  "title": "Demo Income Certificate Application",
+  "title_ta": "மாதிரி வருமானச் சான்றிதழ் விண்ணப்பம்",
+  "service_type": "income_certificate",
+  "target_url": "http://127.0.0.1:8000/demo-portal/",
+  "steps": [
+    {
+      "step_id": "step_1_applicant",
+      "step_index": 1,
+      "title": "Applicant Details",
+      "title_ta": "விண்ணப்பதாரர் விவரங்கள்",
+      "description": "Enter the primary applicant identity details (Fictional Demo Data only).",
+      "description_ta": "முதன்மை விண்ணப்பதாரர் விவரங்களை உள்ளிடவும் (மாதிரி தரவு மட்டுமே).",
+      "fields": [
+        {
+          "name": "applicant_name",
+          "label": "Applicant Full Name",
+          "label_ta": "விண்ணப்பதாரர் பெயர்",
+          "field_type": "text",
+          "selector": "[data-field='applicant_name']",
+          "required": true,
+          "min_length": 2,
+          "max_length": 100,
+          "placeholder": "e.g. K. Ananya (Demo)",
+          "sample_value": "K. Ananya (Demo)",
+          "help_text": "Enter fictional full name with initial",
+          "help_text_ta": "முழுப் பெயரை உள்ளிடவும்"
+        },
+        {
+          "name": "parent_guardian_name",
+          "label": "Parent / Spouse Name",
+          "label_ta": "பெற்றோர் / கணவர் பெயர்",
+          "field_type": "text",
+          "selector": "[data-field='parent_guardian_name']",
+          "required": true,
+          "min_length": 2,
+          "max_length": 100,
+          "placeholder": "e.g. M. Kumar (Demo)",
+          "sample_value": "M. Kumar (Demo)",
+          "help_text": "Father, mother, or legal guardian name",
+          "help_text_ta": "தந்தை அல்லது தாய் பெயர்"
+        },
+        {
+          "name": "gender",
+          "label": "Gender",
+          "label_ta": "பாலினம்",
+          "field_type": "select",
+          "selector": "[data-field='gender']",
+          "required": true,
+          "options": [
+            {"value": "female", "label": "Female", "label_ta": "பெண்"},
+            {"value": "male", "label": "Male", "label_ta": "ஆண்"},
+            {"value": "other", "label": "Third Gender / Other", "label_ta": "மூன்றாம் பாலினம் / பிற"}
+          ],
+          "sample_value": "female",
+          "help_text": "Select gender",
+          "help_text_ta": "பாலினத்தைத் தேர்ந்தெடுக்கவும்"
+        },
+        {
+          "name": "dob",
+          "label": "Date of Birth",
+          "label_ta": "பிறந்த தேதி",
+          "field_type": "date",
+          "selector": "[data-field='dob']",
+          "required": true,
+          "sample_value": "1995-06-15",
+          "help_text": "Applicant date of birth (YYYY-MM-DD)",
+          "help_text_ta": "பிறந்த தேதி"
+        }
+      ]
+    },
+    {
+      "step_id": "step_2_address",
+      "step_index": 2,
+      "title": "Address & Jurisdiction",
+      "title_ta": "முகவரி மற்றும் அதிகார வரம்பு",
+      "description": "Enter residential address details within the jurisdiction.",
+      "description_ta": "குடியிருப்பு முகவரி விவரங்களை உள்ளிடவும்.",
+      "fields": [
+        {
+          "name": "door_and_street",
+          "label": "Door No. & Street",
+          "label_ta": "கதவு எண் மற்றும் தெரு",
+          "field_type": "text",
+          "selector": "[data-field='door_and_street']",
+          "required": true,
+          "min_length": 3,
+          "max_length": 150,
+          "placeholder": "e.g. 12, Gandhi Street (Demo)",
+          "sample_value": "12, Gandhi Street (Demo)",
+          "help_text": "Residential building and street address",
+          "help_text_ta": "முகவரி மற்றும் தெரு பெயர்"
+        },
+        {
+          "name": "taluk",
+          "label": "Taluk",
+          "label_ta": "வட்டம்",
+          "field_type": "select",
+          "selector": "[data-field='taluk']",
+          "required": true,
+          "options": [
+            {"value": "Mylapore", "label": "Mylapore", "label_ta": "மயிலாப்பூர்"},
+            {"value": "Egmore", "label": "Egmore", "label_ta": "எழும்பூர்"},
+            {"value": "Guindy", "label": "Guindy", "label_ta": "கிண்டி"},
+            {"value": "Tambaram", "label": "Tambaram", "label_ta": "தாம்பரம்"},
+            {"value": "Ambattur", "label": "Ambattur", "label_ta": "அம்பத்தூர்"}
+          ],
+          "sample_value": "Mylapore",
+          "help_text": "Administrative taluk",
+          "help_text_ta": "வட்டத்தைத் தேர்ந்தெடுக்கவும்"
+        },
+        {
+          "name": "district",
+          "label": "District",
+          "label_ta": "மாவட்டம்",
+          "field_type": "text",
+          "selector": "[data-field='district']",
+          "required": true,
+          "min_length": 2,
+          "max_length": 100,
+          "sample_value": "Chennai (Demo)",
+          "placeholder": "e.g. Chennai (Demo)",
+          "help_text": "Revenue district",
+          "help_text_ta": "வருவாய் மாவட்டம்"
+        },
+        {
+          "name": "pincode",
+          "label": "Postal PIN Code",
+          "label_ta": "அஞ்சல் குறியீட்டு எண்",
+          "field_type": "text",
+          "selector": "[data-field='pincode']",
+          "required": true,
+          "min_length": 6,
+          "max_length": 6,
+          "sample_value": "600004",
+          "placeholder": "600004",
+          "help_text": "6-digit postal code",
+          "help_text_ta": "6 இலக்க அஞ்சல் குறியீடு"
+        }
+      ]
+    },
+    {
+      "step_id": "step_3_income",
+      "step_index": 3,
+      "title": "Income & Occupation",
+      "title_ta": "வருமானம் மற்றும் தொழில்",
+      "description": "Declare annual family income and occupational category.",
+      "description_ta": "குடும்ப ஆண்டு வருமானம் மற்றும் தொழில் விவரங்களை உள்ளிடவும்.",
+      "fields": [
+        {
+          "name": "occupation",
+          "label": "Primary Occupation",
+          "label_ta": "முதன்மை தொழில்",
+          "field_type": "select",
+          "selector": "[data-field='occupation']",
+          "required": true,
+          "options": [
+            {"value": "Self-employed", "label": "Self-employed / Trade", "label_ta": "சுயதொழில் / வணிகம்"},
+            {"value": "Private Sector Employee", "label": "Private Sector Employee", "label_ta": "தனியார் துறை பணியாளர்"},
+            {"value": "Agriculture", "label": "Agriculture / Cultivator", "label_ta": "விவசாயம்"},
+            {"value": "Daily Wage / Artisan", "label": "Daily Wage / Artisan", "label_ta": "தினக்கூலி / கைவினைஞர்"},
+            {"value": "Homemaker / Student", "label": "Homemaker / Student", "label_ta": "குடும்பத் தலைவி / மாணவர்"}
+          ],
+          "sample_value": "Self-employed",
+          "help_text": "Main source of livelihood",
+          "help_text_ta": "வாழ்வாதார முறை"
+        },
+        {
+          "name": "annual_income",
+          "label": "Declared Annual Family Income (INR)",
+          "label_ta": "குடும்ப ஆண்டு வருமானம் (ரூ.)",
+          "field_type": "number",
+          "selector": "[data-field='annual_income']",
+          "required": true,
+          "min_val": 1000,
+          "max_val": 10000000,
+          "sample_value": 72000,
+          "placeholder": "e.g. 72000",
+          "help_text": "Total annual income from all sources in Indian Rupees",
+          "help_text_ta": "அனைத்து வழிகளிலிருந்தும் கிடைக்கும் மொத்த ஆண்டு வருமானம்"
+        },
+        {
+          "name": "source_of_income",
+          "label": "Primary Income Source Details",
+          "label_ta": "வருமான ஆதாரம் விளக்கம்",
+          "field_type": "text",
+          "selector": "[data-field='source_of_income']",
+          "required": true,
+          "min_length": 3,
+          "max_length": 150,
+          "sample_value": "Tailoring & Handicrafts (Demo)",
+          "placeholder": "e.g. Tailoring & Handicrafts (Demo)",
+          "help_text": "Description of occupation/income source",
+          "help_text_ta": "தொழில் அல்லது வருமான ஆதாரம் பற்றிய விவரம்"
+        }
+      ]
+    },
+    {
+      "step_id": "step_4_purpose",
+      "step_index": 4,
+      "title": "Purpose of Application",
+      "title_ta": "சான்றிதழ் தேவைப்படும் நோக்கம்",
+      "description": "Specify the intended purpose for obtaining the income certificate.",
+      "description_ta": "வருமானச் சான்றிதழ் தேவைப்படுவதற்கான காரணத்தைக் குறிப்பிடவும்.",
+      "fields": [
+        {
+          "name": "purpose",
+          "label": "Purpose of Certificate",
+          "label_ta": "சான்றிதழின் நோக்கம்",
+          "field_type": "select",
+          "selector": "[data-field='purpose']",
+          "required": true,
+          "options": [
+            {"value": "Higher Education Scholarship", "label": "Higher Education Scholarship", "label_ta": "உயர் கல்வி உதவித்தொகை"},
+            {"value": "RTE School Admission", "label": "RTE School Admission (25% Quota)", "label_ta": "இலவச கட்டாயக் கல்வி மாணவர் சேர்க்கை"},
+            {"value": "Government Welfare Scheme", "label": "Government Welfare Scheme", "label_ta": "அரசு நலத்திட்டங்கள்"},
+            {"value": "Housing Subsidy", "label": "Housing Subsidy / Allotment", "label_ta": "வீட்டு மானியம் / ஒதுக்கீடு"}
+          ],
+          "sample_value": "Higher Education Scholarship",
+          "help_text": "Reason for applying",
+          "help_text_ta": "சான்றிதழ் தேவைப்படும் காரணம்"
+        },
+        {
+          "name": "remarks",
+          "label": "Additional Remarks",
+          "label_ta": "கூடுதல் குறிப்புகள்",
+          "field_type": "text",
+          "selector": "[data-field='remarks']",
+          "required": false,
+          "max_length": 250,
+          "sample_value": "Applying for college merit scholarship (Demo)",
+          "placeholder": "Optional remarks",
+          "help_text": "Any supplementary educational notes",
+          "help_text_ta": "கூடுதல் விவரங்கள் (தேவையெனில்)"
+        }
+      ]
+    },
+    {
+      "step_id": "step_5_review",
+      "step_index": 5,
+      "title": "Review & Confirmation",
+      "title_ta": "சரிபார்த்தல் மற்றும் உறுதிப்படுத்தல்",
+      "description": "Review filled information before submitting demo application.",
+      "description_ta": "மாதிரி விண்ணப்பத்தைச் சமர்ப்பிக்கும் முன் தகவல்களைச் சரிபார்க்கவும்.",
+      "fields": []
+    }
+  ],
+  "fictional_sample_values": {
+    "applicant_name": "K. Ananya (Demo)",
+    "parent_guardian_name": "M. Kumar (Demo)",
+    "gender": "female",
+    "dob": "1995-06-15",
+    "door_and_street": "12, Gandhi Street (Demo)",
+    "taluk": "Mylapore",
+    "district": "Chennai (Demo)",
+    "pincode": "600004",
+    "occupation": "Self-employed",
+    "annual_income": 72000,
+    "source_of_income": "Tailoring & Handicrafts (Demo)",
+    "purpose": "Higher Education Scholarship",
+    "remarks": "Applying for college merit scholarship (Demo)"
+  }
+}

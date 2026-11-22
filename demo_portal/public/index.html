@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CivicLens [DEMO] Public Service Portal</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- Top Educational Simulation Banner -->
+  <header class="demo-banner" role="banner">
+    <div class="demo-banner-content">
+      <span class="demo-tag">SIMULATION DEMO</span>
+      <p class="demo-banner-text">
+        <strong>EDUCATIONAL DEMO ONLY:</strong> Localhost simulation for citizen training. 
+        No data is sent to government agencies. Do not use real personal data.
+      </p>
+      <div class="lang-switcher">
+        <button id="lang-en-btn" type="button" class="lang-btn active">English</button>
+        <button id="lang-ta-btn" type="button" class="lang-btn">தமிழ்</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="portal-container">
+    <div class="portal-header">
+      <div class="portal-title-group">
+        <h1 id="portal-title">Income Certificate Application (Educational Demo)</h1>
+        <p id="portal-subtitle" class="portal-subtitle">Revenue & Disaster Management Department Simulation</p>
+      </div>
+      <div class="portal-badge" id="service-badge">Revenue Service #REV-04D</div>
+    </div>
+
+    <!-- Stepper Navigation -->
+    <nav class="step-indicator" aria-label="Application Steps">
+      <div class="step-item active" data-step="1">
+        <div class="step-number">1</div>
+        <div class="step-label" data-i18n="step1">Applicant</div>
+      </div>
+      <div class="step-line"></div>
+      <div class="step-item" data-step="2">
+        <div class="step-number">2</div>
+        <div class="step-label" data-i18n="step2">Address</div>
+      </div>
+      <div class="step-line"></div>
+      <div class="step-item" data-step="3">
+        <div class="step-number">3</div>
+        <div class="step-label" data-i18n="step3">Income</div>
+      </div>
+      <div class="step-line"></div>
+      <div class="step-item" data-step="4">
+        <div class="step-number">4</div>
+        <div class="step-label" data-i18n="step4">Purpose</div>
+      </div>
+      <div class="step-line"></div>
+      <div class="step-item" data-step="5">
+        <div class="step-number">5</div>
+        <div class="step-label" data-i18n="step5">Review</div>
+      </div>
+    </nav>
+
+    <!-- Notification Area -->
+    <div id="alert-box" class="alert-box hidden" role="alert"></div>
+
+    <!-- Multi-Step Form -->
+    <form id="demo-form" novalidate>
+
+      <!-- Step 1: Applicant Details -->
+      <section class="form-step" id="step-panel-1">
+        <h2 class="step-heading" data-i18n="step1_heading">Step 1: Applicant Details (Fictional Data)</h2>
+        <p class="step-desc" data-i18n="step1_desc">Provide demo applicant identity details. Real names or identifiers are blocked.</p>
+
+        <div class="form-grid">
+          <div class="form-group full-width">
+            <label for="applicant_name" data-i18n="lbl_applicant_name">Applicant Full Name *</label>
+            <input type="text" id="applicant_name" data-field="applicant_name" placeholder="e.g. K. Ananya (Demo)" required>
+            <span class="field-hint" data-i18n="hint_applicant_name">Include initial and fictional suffix</span>
+          </div>
+
+          <div class="form-group full-width">
+            <label for="parent_guardian_name" data-i18n="lbl_parent_name">Parent / Spouse Name *</label>
+            <input type="text" id="parent_guardian_name" data-field="parent_guardian_name" placeholder="e.g. M. Kumar (Demo)" required>
+            <span class="field-hint" data-i18n="hint_parent_name">Father, mother, or legal guardian</span>
+          </div>
+
+          <div class="form-group">
+            <label for="gender" data-i18n="lbl_gender">Gender *</label>
+            <select id="gender" data-field="gender" required>
+              <option value="">-- Select Gender --</option>
+              <option value="female">Female</option>
+              <option value="male">Male</option>
+              <option value="other">Third Gender / Other</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="dob" data-i18n="lbl_dob">Date of Birth *</label>
+            <input type="date" id="dob" data-field="dob" required>
+          </div>
+        </div>
+      </section>
+
+      <!-- Step 2: Address Details -->
+      <section class="form-step hidden" id="step-panel-2">
+        <h2 class="step-heading" data-i18n="step2_heading">Step 2: Address & Jurisdiction</h2>
+        <p class="step-desc" data-i18n="step2_desc">Enter the applicant's demo residential address for jurisdictional verification.</p>
+
+        <div class="form-grid">
+          <div class="form-group full-width">
+            <label for="door_and_street" data-i18n="lbl_door_street">Door No. & Street *</label>
+            <input type="text" id="door_and_street" data-field="door_and_street" placeholder="e.g. 12, Gandhi Street (Demo)" required>
+          </div>
+
+          <div class="form-group">
+            <label for="taluk" data-i18n="lbl_taluk">Taluk *</label>
+            <select id="taluk" data-field="taluk" required>
+              <option value="">-- Select Taluk --</option>
+              <option value="Mylapore">Mylapore</option>
+              <option value="Egmore">Egmore</option>
+              <option value="Guindy">Guindy</option>
+              <option value="Tambaram">Tambaram</option>
+              <option value="Ambattur">Ambattur</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="district" data-i18n="lbl_district">District *</label>
+            <input type="text" id="district" data-field="district" value="Chennai (Demo)" required>
+          </div>
+
+          <div class="form-group">
+            <label for="pincode" data-i18n="lbl_pincode">Postal PIN Code *</label>
+            <input type="text" id="pincode" data-field="pincode" placeholder="600004" maxlength="6" required>
+          </div>
+        </div>
+      </section>
+
+      <!-- Step 3: Income & Occupation -->
+      <section class="form-step hidden" id="step-panel-3">
+        <h2 class="step-heading" data-i18n="step3_heading">Step 3: Income & Occupation Declaration</h2>
+        <p class="step-desc" data-i18n="step3_desc">Declare annual family income and occupational source for eligibility assessment.</p>
+
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="occupation" data-i18n="lbl_occupation">Primary Occupation *</label>
+            <select id="occupation" data-field="occupation" required>
+              <option value="">-- Select Occupation --</option>
+              <option value="Self-employed">Self-employed / Trade</option>
+              <option value="Private Sector Employee">Private Sector Employee</option>
+              <option value="Agriculture">Agriculture / Cultivator</option>
+              <option value="Daily Wage / Artisan">Daily Wage / Artisan</option>
+              <option value="Homemaker / Student">Homemaker / Student</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="annual_income" data-i18n="lbl_annual_income">Annual Family Income (INR) *</label>
+            <input type="number" id="annual_income" data-field="annual_income" placeholder="72000" min="1000" max="10000000" required>
+            <span class="field-hint" data-i18n="hint_annual_income">Total combined annual income</span>
+          </div>
+
+          <div class="form-group full-width">
+            <label for="source_of_income" data-i18n="lbl_source_income">Primary Income Source Details *</label>
+            <input type="text" id="source_of_income" data-field="source_of_income" placeholder="e.g. Tailoring & Handicrafts (Demo)" required>
+          </div>
+        </div>
+      </section>
+
+      <!-- Step 4: Purpose & Remarks -->
+      <section class="form-step hidden" id="step-panel-4">
+        <h2 class="step-heading" data-i18n="step4_heading">Step 4: Purpose of Application</h2>
+        <p class="step-desc" data-i18n="step4_desc">Select the intended use case for the income certificate.</p>
+
+        <div class="form-grid">
+          <div class="form-group full-width">
+            <label for="purpose" data-i18n="lbl_purpose">Purpose of Certificate *</label>
+            <select id="purpose" data-field="purpose" required>
+              <option value="">-- Select Purpose --</option>
+              <option value="Higher Education Scholarship">Higher Education Scholarship</option>
+              <option value="RTE School Admission">RTE School Admission (25% Quota)</option>
+              <option value="Government Welfare Scheme">Government Welfare Scheme</option>
+              <option value="Housing Subsidy">Housing Subsidy / Allotment</option>
+            </select>
+          </div>
+
+          <div class="form-group full-width">
+            <label for="remarks" data-i18n="lbl_remarks">Additional Remarks (Optional)</label>
+            <input type="text" id="remarks" data-field="remarks" placeholder="Optional notes for demonstration">
+          </div>
+        </div>
+      </section>
+
+      <!-- Step 5: Review & Confirmation -->
+      <section class="form-step hidden" id="step-panel-5">
+        <h2 class="step-heading" data-i18n="step5_heading">Step 5: Review & Confirmation</h2>
+        <p class="step-desc" data-i18n="step5_desc">Review the entered details before recording this demo application submission.</p>
+
+        <div class="review-table-container">
+          <table class="review-table" id="review-table">
+            <thead>
+              <tr>
+                <th data-i18n="tbl_field">Field</th>
+                <th data-i18n="tbl_value">Entered Value</th>
+              </tr>
+            </thead>
+            <tbody id="review-table-body">
+              <!-- Dynamically populated -->
+            </tbody>
+          </table>
+        </div>
+
+        <div class="confirmation-box">
+          <label class="checkbox-label">
+            <input type="checkbox" id="fictional_acknowledged" data-field="fictional_acknowledged" required>
+            <span data-i18n="lbl_confirm_demo">I confirm that all entered details are fictional demo data for educational purposes.</span>
+          </label>
+        </div>
+      </section>
+
+      <!-- Form Navigation Actions -->
+      <div class="form-actions">
+        <button type="button" id="btn-back" class="btn btn-secondary hidden" data-i18n="btn_back">← Back</button>
+        <button type="button" id="btn-sample-fill" class="btn btn-outline" data-i18n="btn_sample">Fill Sample Data</button>
+        <button type="button" id="btn-next" class="btn btn-primary" data-i18n="btn_next">Continue →</button>
+        <button type="button" id="btn-submit" class="btn btn-success hidden" data-action="submit" data-i18n="btn_submit">Submit Demo Application</button>
+      </div>
+
+    </form>
+
+    <!-- Submission Success Card (Hidden initially) -->
+    <section id="submission-success" class="success-card hidden">
+      <div class="success-icon">✓</div>
+      <div class="demo-tag success-tag">DEMO RECORD ONLY</div>
+      <h2 id="success-title">Demo Application Recorded</h2>
+      <p id="success-msg">Your practice submission has been simulated successfully. No actual government record was created.</p>
+
+      <div class="receipt-box">
+        <div class="receipt-row">
+          <span class="receipt-label">Demo Application Ref:</span>
+          <strong id="receipt-ref" class="receipt-value mono">DEMO-IC-XXXXXX</strong>
+        </div>
+        <div class="receipt-row">
+          <span class="receipt-label">Simulation Timestamp:</span>
+          <span id="receipt-time" class="receipt-value"></span>
+        </div>
+        <div class="receipt-row">
+          <span class="receipt-label">Applicant (Demo):</span>
+          <span id="receipt-applicant" class="receipt-value"></span>
+        </div>
+        <div class="receipt-row">
+          <span class="receipt-label">Service Type:</span>
+          <span class="receipt-value">Income Certificate (Demo Simulation)</span>
+        </div>
+      </div>
+
+      <div class="success-actions">
+        <button type="button" id="btn-restart" class="btn btn-primary">Start New Demo Workflow</button>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="portal-footer">
+    <p>CivicLens Educational Simulation Sandbox &bull; Built for citizen guidance and workflow transparency.</p>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,305 @@
+# CivicLens Implementation Roadmap
+
+This document tracks progress across all 16 project phases of CivicLens.
+
+- [x] **Phase 1: Project Setup and Folder Structure**
+  - Verify system toolchain (Node.js, npm, Python, pip, Git).
+  - Scaffold monorepo directory layout (`frontend/`, `backend/`, `docs/`, `demo_portal/`).
+  - Configure initial `.gitignore` and `.env.example` templates.
+  - Set up standard React + Vite frontend and lightweight Python virtual environment.
+  - Document project brief, system architecture, and 16-phase roadmap.
+
+- [x] **Phase 2: Frontend Foundation and Design System**
+  - Configure Tailwind CSS (v4) with civic-tech palette tokens, accessible contrast, and visible focus rings.
+  - Integrate offline typography using `@fontsource/inter` (Latin) and `@fontsource/noto-sans-tamil` (Tamil).
+  - Scaffold bilingual context (`LanguageProvider`, `useLanguage`) and translation dictionaries (`en.js`, `ta.js`) with localStorage persistence and dynamic `<html>` `lang` attributes.
+  - Build reusable UI component suite (`Button`, `Card`, `Badge`, `Input`, `Textarea`, `Select`, `Alert`, `Spinner`, `Skeleton`, `Modal`, `FileDropzone`, `EmptyState`, `ErrorState`, `PageHeader`, `Logo`, `LanguageSwitcher`).
+  - Implement notification system (`ToastProvider`, `useToast`).
+  - Create responsive `PublicLayout` and `AppLayout` (with mobile drawer and active route indicator).
+  - Configure React Router routes for all 8 destinations, 404 page, and `/design-system` developer catalog.
+
+- [x] **Phase 3: Landing Page and Dashboard**
+  - Implement 7-section responsive Landing Page (`/`) with Hero, inline SVG civic artwork, The Problem, Five Core Capabilities, How it Works (Central Agent flow), Evidence and Trust, Bilingual Support, and CTA.
+  - Add comprehensive footer navigation links across all primary pages and modules in `PublicLayout`.
+  - Build Central Dashboard (`/dashboard`) with welcome header, Gemini AI Assistant shortcut card, 4 interactive prompt suggestion chips carrying query/state to `/assistant`, 5 module navigation cards, 4 quick action buttons, and honest empty-state widgets for recent activity and uploaded documents.
+  - Add complete English and Tamil translations across all new sections with dynamic browser title updates and zero hardcoded text.
+
+- [x] **Phase 4: Backend Setup and Frontend-Backend Connection**
+  - Scaffold lightweight FastAPI application with Pydantic v2 settings (`backend/app/core/config.py`).
+  - Configure CORS middleware, request ID generation, and structured console logging (`backend/app/core/logging.py`).
+  - Implement uniform JSON error envelope (`backend/app/core/errors.py`) with handlers for 422 validation, HTTP errors, and unhandled 500 exceptions.
+  - Implement `/api/v1/health` and `/api/v1/info` endpoints exposing version, environment, supported languages, modules, and Gemini readiness status.
+  - Write and verify automated test suite (`backend/tests/test_health.py`) using `pytest` and `httpx` (5/5 tests passing).
+  - Implement unified `apiClient.js` with timeout handling (AbortController) and typed `ApiError` class.
+  - Create `healthService.js` and `useBackendStatus.js` hook with automatic 30s background polling and manual retry.
+  - Build bilingual UI components: `BackendStatus.jsx` badge in `AppLayout` and `PublicLayout`, and `SystemStatusCard.jsx` on `/dashboard` showing real backend metadata or offline instructions with PowerShell start command.
+  - Full English and Tamil localization (`status` namespace) with zero hardcoded strings and 0 lint warnings.
+- [x] **Phase 5: Gemini API Integration**
+  - Install official `google-genai` SDK in backend venv and document in `requirements.txt`.
+  - Configure `Settings` in `config.py` with configurable `GEMINI_MODEL` (defaulting to `gemini-2.5-flash`), timeout (30s), retries (2), low temperature (0.2), and max tokens (2048).
+  - Implement base system prompt and safety guidelines (`app/core/prompts.py`) establishing evidence grounding, prompt injection defenses, plain language, and Tamil/English bilingual rules.
+  - Implement asynchronous `GeminiService` (`app/services/gemini_service.py`) with `generate_text`, Pydantic-validated `generate_structured`, and function-calling skeleton `generate_with_tools` (prepared for Phase 9).
+  - Add custom exception hierarchy (`GeminiError`, `GeminiNotConfiguredError`, `GeminiRateLimitError`, `GeminiTimeoutError`, `GeminiSafetyBlockedError`, `GeminiStructuredOutputError`) mapped to standard JSON error envelope in `app/core/errors.py`.
+  - Add API endpoints in `app/api/gemini.py`: `GET /api/v1/gemini/status` (costs no quota) and `POST /api/v1/gemini/test` with rolling in-memory rate limiting (max 5 calls/min).
+  - Add unit and integration test suite (`tests/test_gemini.py`) with 14 mocked tests covering success, retries, 429 backoff, timeouts, schema validation, rate limiting, and secret leakage prevention, plus an optional live test.
+  - Add frontend `geminiService.js` and integrate interactive AI Engine status and diagnostic test button into `SystemStatusCard.jsx` on `/dashboard` with bilingual English and Tamil localization.
+- [x] **Phase 6: AI Chatbot with Tamil and English Support**
+  - Implement Unicode script analysis in `app/services/language_service.py` to detect English, Tamil, and mixed queries with zero third-party dependencies.
+  - Implement language resolution rules and language-specific system prompts (`build_language_instruction`) for English and Tamil with parenthetical official terms.
+  - Add Pydantic schemas in `app/models/chat.py` (`ChatMessage`, `ChatRequest`, `ChatResponse`, `SourceCitation`, `ToolActivityItem`) prepared for Phases 8 and 9.
+  - Implement `ChatService` (`app/services/chat_service.py`) with history trimming (last 10 turns, 12,000 char budget), injection defense, and base + chat notice system instructions.
+  - Add `POST /api/v1/chat` endpoint (`app/api/chat.py`) with rolling in-memory rate limiting (max 20 calls/min).
+  - Add unit and integration tests (`tests/test_language.py`, `tests/test_chat.py`) covering detection, bilingual responses, rate limits, history trimming, and zero key/message leakage (40/40 tests passing).
+  - Install `react-markdown` and build frontend `chatService.js`, `chatStorage.js` (localStorage up to 30 conversations), and `useChat` hook with message abortion, retries, and persistence.
+  - Build responsive bilingual AI Assistant page (`src/pages/Assistant.jsx`) with conversations sidebar, safe markdown rendering, honest prototype notices, dashboard prefill support, and disabled Phase 7 file attachment button.
+- [x] **Phase 7: PDF Upload and Document Processing**
+  - Install and configure PyMuPDF (`pymupdf`), Pillow (`Pillow`), and pytesseract (`pytesseract`) with configurable settings in `config.py` and `.env.example` (max upload MB, page limits, OCR options, chunk sizes).
+  - Implement filesystem-backed `DocumentStore` (`app/services/document_store.py`) with atomic JSON writes, path-traversal prevention, filename sanitization, and interface designed for seamless Phase 15 SQLite migration.
+  - Implement `DocumentService` (`app/services/document_service.py`) supporting magic byte verification (`%PDF-`), streaming size limits, encryption detection, PyMuPDF page-by-page text extraction, text quality heuristic assessment, fast Tesseract availability check via `shutil.which`, OCR fallback, aggregate language detection, and page-isolated text chunking (never merging across page boundaries).
+  - Add AI document summarization with prompt injection defenses (`wrap_untrusted_content`, structured Markdown directives, English/Tamil bilingual rules) and per-document/language caching to conserve Gemini free-tier quota.
+  - Implement FastAPI endpoints in `app/api/documents.py`: `GET /capabilities`, `POST /upload` (with duplicate detection via SHA-256 and background task extraction), `GET /`, `GET /{id}`, `GET /{id}/pages`, `GET /{id}/pages/{page_number}`, `GET /{id}/file` (with `nosniff`), `POST /{id}/summary`, and `DELETE /{id}` with upload rate limiting (10/min).
+  - Add comprehensive pytest suite (`tests/test_documents.py`) using in-memory generated PDFs via PyMuPDF covering validation, lifecycle, page-isolated chunking, duplicate detection, OCR fallback, AI summary caching, and rate limiting (48/48 backend tests passing).
+  - Build frontend `documentService.js`, `useDocuments.js` hook with live polling for active tasks, and complete bilingual `Documents.jsx` page with civic privacy notice, upload dropzone, document list, page-by-page text viewer, AI summary generator, and original PDF viewer.
+  - Connect Dashboard `RecentDocuments.jsx` to live backend data feed and wire up Assistant attach button to Document Intelligence.
+- [x] **Phase 8: RAG and Evidence-Based Document Question Answering**
+  - Install and configure CPU-optimized FastEmbed (`fastembed`), FAISS CPU (`faiss-cpu`), and NumPy (`numpy`) using `intfloat/multilingual-e5-small` (384-dimensional L2-normalized vectors) with strict asymmetric prefixes (`passage: ` and `query: `).
+  - Implement thread-safe lazy-loading `EmbeddingService` (`app/services/embedding_service.py`) running entirely on CPU via ONNX Runtime with zero heavy GPU/PyTorch dependencies.
+  - Implement per-document vector storage (`app/services/rag_service.py`) under `backend/data/indexes/<document_id>/` with atomic writes, metadata persistence, and an in-memory LRU cache (`IndexCache`, capacity 3) to prevent repeated disk I/O.
+  - Implement hybrid retrieval combining vector cosine similarity ($0.70$) and Tamil-aware lexical matching ($0.30$) with automated evidence level classification (`strong`, `weak`, `none`).
+  - Implement zero-call guardrail: when evidence level is `none`, Gemini generation is completely skipped to conserve API quota and eliminate hallucinated answers.
+  - Implement structured grounded Q&A generation (`app/services/rag_service.py`) using `generate_structured` with Pydantic `GroundedAnswer` schema, prompt injection isolation via `<untrusted_passage>` XML tags, and 6,000-character context budget truncation.
+  - Implement strict backend citation verification: invalid/hallucinated chunk IDs are dropped, authoritative `page_number` and `document_name` are populated strictly from backend chunk metadata (never LLM text), and verbatim quote accuracy is strictly verified.
+  - Add API endpoints in `app/api/documents.py`: `POST /{id}/index` (build/rebuild vector index), `POST /{id}/retrieve` (standalone hybrid search without LLM calls), and `POST /{id}/ask` (grounded Q&A) protected by rolling in-memory rate limiting (10 req/min) and privacy logging that never leaks queries or text.
+  - Comprehensive pytest suite (`tests/test_rag.py`) with 9 unit/integration tests using deterministic fake embeddings covering vector normalization, Tamil token matching, atomic indexing, LRU caching, evidence boundaries, backend citation verification, and rate limiting (57/57 backend tests passing).
+  - Update frontend `documentService.js`, add comprehensive English and Tamil localization keys, and enhance `Documents.jsx` with full interactive Q&A panel, clickable suggested questions, evidence level badges, verified citation chips with instant jump-to-page navigation, and raw passage inspection.
+- [x] **Phase 9: Central AI Agent and Function Calling**
+  - Implement dynamic Tool Registry (`app/agent/tools.py`) with 3 available tools (`list_documents`, `read_document`, `retrieve_evidence`) and 7 planned tools (`search_official_sources`, `compare_documents`, `check_claim`, `generate_checklist`, `draft_complaint`, `open_service_portal`, `fill_demo_form`). Generate Gemini `FunctionDeclaration` objects exclusively for available tools.
+  - Implement production Gemini Function Calling (`GeminiService.generate_with_tools` in `app/services/gemini_service.py`) using `google-genai` SDK with `automatic_function_calling=types.AutomaticFunctionCallingConfig(disable=True)` to ensure total orchestrator control over tool execution.
+  - Implement `AgentOrchestrator` (`app/agent/orchestrator.py`) with bounded loop execution (max 4 steps, max 6 tool calls/run, max 3 calls/step) and 7-stage Safe Execution Pipeline: availability check, Pydantic argument validation, UUID/document authorization check, citizen approval check, loop short-circuiting, timeout/exception protection, and privacy-safe activity summary generation.
+  - Implement Evidence Ledger & Strict Backend Citation Verification: LLM cites bracketed labels `[E1]`, `[E2]`; backend drops hallucinated labels and populates `sources` exclusively from verified backend chunk metadata (`page_number`, `document_name`). LLM is strictly prohibited from generating page numbers.
+  - Implement in-memory thread-safe `ApprovalStore` (`app/agent/approval.py`) with 10-minute expiry and atomic single-use consumption for sensitive tools requiring explicit citizen authorization (`approve` or `deny`).
+  - Implement REST API endpoints in `app/api/agent.py`: `POST /api/v1/agent/chat` (rolling rate limit 10/min), `GET /api/v1/agent/tools` (tool inspection and availability counts), and `POST /api/v1/agent/approvals/{id}` (human-in-the-loop decision submission) with zero-leak privacy logging. Legacy `/api/v1/chat` remains fully backward-compatible.
+  - Comprehensive pytest suite (`tests/test_agent.py`) with 12 unit/integration tests covering tool declarations, direct answers, document retrieval, unverified citation dropping, invalid UUID rejection, planned tool rejection, duplicate short-circuiting, step limit honest degradation, approval flow, rate limiting, and legacy chat compatibility (69/69 backend tests passing).
+  - Build frontend `agentService.js`, enhance `useChat.js` with document context selection and approval resumption, update `Assistant.jsx` with Document Picker modal, selected context chips, live execution status, collapsible Tool Activity timeline with intent badges and numbered citation chips, and interactive Citizen Authorization cards.
+  - Connect citation navigation to `Documents.jsx` with automatic document inspection and jump-to-page scrolling, and add interactive approval demo in `DesignSystem.jsx` with full English and Tamil localization.
+- [x] **Phase 10: Policy Change Detection**
+  - Implement deterministic text normalization (`app/services/comparison_service.py`): Unicode NFC, curly quote/dash/bullet unification, Tamil numeral to Western digit conversion, Indian thousand separator normalization (`2,50,000` -> `250000`), and repeated header/footer removal.
+  - Implement clause segmentation (`segment_document`) with heading hierarchy and clause boundary detection preserving exact page numbers and char offsets.
+  - Implement monotonic sequence alignment (`align_segments`) via SequenceMatcher + LCS with moved clause detection (position shift > 0.35) and formatting-only classification.
+  - Implement token-level diffing (`compute_word_diff`) producing precise `equal`, `insert`, and `delete` operations for visual rendering.
+  - Implement deterministic fact extraction (`extract_facts_from_text`) and fact delta calculation (`compute_fact_changes`) for dates (including Tamil months), amounts (Rs/₹/lakh/crore), percentages, ages, durations, and statutory codes.
+  - Implement noise filtering: formatting-only shifts and moved clauses without wording changes are routed to `minor_differences` to keep change cards strictly focused on policy changes.
+  - Implement strictly budgeted Gemini structured analysis: candidates processed in batches of 12 with a hard cap of 4 calls per comparison. Enforce deterministic overrides so AI cannot suppress detected fact changes.
+  - Implement filesystem-backed `ComparisonStore` (`app/services/comparison_store.py`) with atomic JSON writes, thread-safe file operations, and SHA-256 pair caching (`cache_index.json`).
+  - Implement REST API endpoints in `app/api/comparison.py`: `POST /api/v1/compare` (with synchronous document validation and background task execution), `GET /api/v1/compare/{id}`, `POST /api/v1/compare/{id}/retry-analysis`, `GET /api/v1/compare`, and `DELETE /api/v1/compare/{id}` protected by rolling rate limiting (3 comparisons/min).
+  - Promote Central Agent tool `compare_documents` from planned to available: provides dual page citations (`[C1]`, `p. X → p. Y`), intent classification `policy_comparison`, and agent activity summaries.
+  - Comprehensive pytest suite (`tests/test_comparison.py`) with 15 tests covering normalization, segmentation, word diff, fact extraction, alignment, noise filtering, API endpoints, caching, deterministic override, and agent tool execution (84/84 backend tests passing).
+  - Build frontend `comparisonService.js`, `useComparison.js` hook with live polling, English/Tamil localization, and interactive `Compare.jsx` page with document selection slots, live progress banner, executive summary, quantitative metrics tiles, filters, word-level diff cards, summary table, minor differences accordion, and past comparisons modal.
+  - Enhance `Assistant.jsx` with dual-page citation badges and direct "Open Policy Comparison" navigation.
+- [x] **Phase 11: Fact Verification**
+  - Implement shared deterministic fact extractor (`app/services/fact_extractor.py`): unified Indian financial amounts (`lakh`, `crore`, `ரூ./Rs./₹`), calendar dates across ISO, DD/MM/YYYY, English and Tamil month names, Tamil numerals to Western digits, percentages, age criteria, and strict equivalence matching (`facts_match`). Refactored `comparison_service.py` to eliminate duplication.
+  - Implement Official Source Library (`app/services/source_library.py`): manifest-backed storage (`manifest.json`), atomic writes, SHA-256 duplicate PDF detection, metadata validation (including URL safety), internal `DocumentStore` reuse for text extraction, and strict isolation preventing official gazettes from polluting citizen user uploads.
+  - Implement multi-source hybrid retrieval (`retrieve_across` in `app/services/rag_service.py`): queries across official sources and/or citizen documents with LRU vector caching, collection tagging (`official` vs `user`), lazy index building, and `evidence_level` evaluation (`strong`, `weak`, `none`).
+  - Implement Fact Verification Engine (`app/services/verification_service.py`) with 4-stage pipeline:
+    - Stage 1: Claim sanitization, language resolution, and atomic claim decomposition into checkable propositions (bypassing Call 1 for short single-sentence claims $\le 300$ chars with decimal period heuristics).
+    - Stage 2: Scope-filtered multi-source retrieval, zero-call guardrails on empty libraries or absent evidence, and S-label passage assignment (`[S1]`, `[S2]`).
+    - Stage 3: Gemini structured output judgement (Call 2) under strict call budget (hard cap 2, max 3).
+    - Stage 4: Deterministic backend verdict rules: verbatim quote verification in chunk text (hallucinated quotes downgraded to `related_but_inconclusive`), fact mismatch checks (dates/amounts overriding AI output with `Contradicted`), manifest supersession verification for `Outdated` verdicts, conflicting source detection, and time-sensitivity warnings.
+  - Implement filesystem-backed `VerificationStore` with atomic JSON writes, thread-safe access, and deterministic SHA-256 query caching (`cache_index.json`).
+  - Implement REST API endpoints in `app/api/sources.py` and `app/api/verification.py`:
+    - Sources: `GET /api/v1/sources`, `GET /{id}`, `POST /`, `PATCH /{id}`, `DELETE /{id}`, `POST /{id}/index`, `GET /{id}/file`, `GET /{id}/pages/{page_number}` (gated by `ALLOW_SOURCE_MANAGEMENT`).
+    - Verification: `POST /api/v1/verify` (immediate 202 with background processing), `GET /{id}`, `POST /{id}/retry-analysis`, `GET /`, `DELETE /{id}` with rolling rate limiter (5 req/min).
+  - Promoted central agent tools in `app/agent/tools.py` and `app/agent/orchestrator.py`: `search_official_sources` and `check_claim` promoted to `available` (6 available tools, 4 planned), with `[S1]`, `[S2]` citation labels, `fact_verification` intent derivation, and `verifications` summaries.
+  - Comprehensive pytest suite (`tests/test_verification.py`) with 12 unit/integration tests covering fact extraction normalisation, library CRUD & URL validation, source isolation, multi-source retrieval, short-claim bypass, Supported verdict with quotes, Contradicted on fact mismatch, hallucinated quote downgrade, Outdated via manifest supersession, prompt injection defense, API endpoints, and agent tool execution (96/96 passing backend tests).
+  - Build frontend services `sourcesService.js` and `verificationService.js`, `useVerification.js` hook with live polling, English/Tamil localization, and interactive `Verify.jsx` page with claim input, example chips, scope selector, user document picker, library status banner, live progress bar, overall verdict card, per-claim cards with aspect breakdown, deterministic fact comparison table, grouped evidence cards, superseded side-by-side comparison, coverage details, past verifications modal, and Official Source Library management panel.
+  - Enhance `Assistant.jsx` with official `[S1]` citation badges, source jumping, and verification outcome cards with direct navigation to full verification reports.
+- [x] **Phase 12: Public Service Assistant**
+  - Implement PII Guard (`app/core/pii_guard.py`) providing regex-based detection for Aadhaar (with checksum and delimiter awareness), PAN, 10-digit Indian mobile numbers, email addresses, and bank account / card numbers, alongside false-positive masking for calendar dates, rupee amounts, and scheme codes. Raises `PIIDetectedError` (422) without echoing sensitive values.
+  - Implement Curated Official Portal Registry (`app/services/portal_registry.py` & `backend/data/portals/registry.json`): deterministic storage, HTTPS validation, domain derivation, and multi-tier matching (linked official source overlap, service type match, and multilingual keyword token ranking). Write operations gated by `ALLOW_PORTAL_MANAGEMENT`. Model is strictly forbidden from writing external links; all links shown to citizens derive exclusively from `registry.json`.
+  - Implement Public Service Assistant Engine (`app/services/public_service_service.py`):
+    - Multi-source retrieval across official source gazettes and citizen documents with `retrieve_across`.
+    - Zero-Call Guardrail: If no evidence is found in official sources, returns `mode = "no_sources"` with 0 Gemini calls, offering general guidance fallback.
+    - Opt-in general guidance mode (`allow_general = True`) with honest `general_unverified` tagging and key fact suppression.
+    - Verbatim quote verification: checklist items backed by exact substring matches in retrieved passages are marked `source_confirmed` (`[S1]`, `[D1]`); others demoted to `needs_check`.
+    - Key authoritative facts (fees, processing times, validity, renewal, grievances) verified against source quotes with `fact_extractor.py`.
+    - Automatic URL and contact number sanitization regex (`URL_REGEX`, `CONTACT_REGEX`) stripping any hallucinated model links to `[link removed]` / `[contact removed]`.
+    - Filesystem-backed `ServiceGuideStore` with atomic JSON writes and thread-safe rolling rate limiter (5 req/min).
+  - Implement Form Field Extraction & Explanation Engine (`app/services/form_field_service.py`):
+    - Multilingual candidate field detection (regex heuristics for English and Tamil government form patterns + numbered row parsing).
+    - Plain-language explanation generation tracking evidence basis (`stated_in_form_text` vs `general_knowledge`), typical documents, and common pitfalls.
+  - Implement REST API endpoints in `app/api/portals.py` and `app/api/services.py`:
+    - Portals: `GET /api/v1/portals`, `GET /{id}`, `POST /`, `PATCH /{id}`, `DELETE /{id}`, `POST /match`.
+    - Services: `POST /api/v1/services/guide`, `GET /guide/{id}`, `POST /guide/{id}/retry-analysis`, `GET /guides`, `POST /form-fields/extract`, `POST /form-fields/explain`.
+  - Promote Central Agent tool in `app/agent/tools.py` and `app/agent/orchestrator.py`: `generate_checklist` promoted to `available` (7 available tools, 3 planned), providing verified `[S1]`/`[D1]` citations, `public_service_guidance` intent derivation, and `checklists` summary items.
+  - Unit and integration tests in `tests/test_services.py` covering PII detection, false-positive protection, portal registry CRUD and deterministic matching, zero-call guardrail, quote verification, general guidance mode, form field extraction/explanation, and agent tool invocation.
+  - Build frontend services `servicesService.js` and `portalsService.js`, `useChecklistProgress.js` hook with privacy guarantee (local storage persistence, 0 server transmission of checkbox states), `useServiceGuide.js` hook, and complete English/Tamil translations in `en.js` and `ta.js`.
+  - Build interactive 4-tab page `frontend/src/pages/Services.jsx`:
+    - Tab 1: "Guidance & Checklist" with query input, applicant category selector, procedure overview, interactive categorized checklist with progress bar and local storage sync, copy/print actions, key facts cards, matched portals, and "Request General Guidance" fallback. Supports direct `?guide_id=...` deep linking.
+    - Tab 2: "Explain Form Fields" with paste/document toggle, candidate detection chips, selection toggles, and basis-tagged explanations.
+    - Tab 3: "Official Portals" with live search, scope pills (State TN, Central, Local), service type pills, caution note boxes, and direct portal navigation.
+    - Tab 4: "Demo Workflow" honestly showing Phase 14 reserved status for Playwright browser sandbox automation.
+  - Enhance `Assistant.jsx` with Public Service Guidance summary cards linking directly to full guides in `Services.jsx`.
+- [x] **Phase 13: Civic Grievance Assistant**
+  - Implement deterministic rule-based pre-analysis in `app/services/grievance_rules.py`:
+    - Bilingual keyword classifier covering 8 municipal grievance categories (Roads, Water Supply, Streetlights, Garbage/Waste, Drainage/Sewage, Public Transport, Parks/Playgrounds, Other) in English and Tamil with tie-breaking and vague fallback.
+    - Deterministic Safety Hazard Rule Engine covering 8 hazard signals (open manholes, live wires, gas leaks, structural collapses, active contamination, fire hazards, road cave-ins, sewage floods) in English and Tamil. Triggers non-dismissable emergency notices pointing directly to official emergency numbers (112 / 100).
+    - Baseline severity calculation (`low`, `medium`, `high`, `urgent`) and strict rule-enforced severity floors (`combine_severity`): model can only raise severity, never lower it below rule-based safety baseline, and can never clear `safety_risk=True`.
+  - Implement secure image handling in `app/services/grievance_images.py`:
+    - Magic bytes format detection (rejecting GIF, SVG, animated, and corrupt files).
+    - Streaming upload validation against size limit (5 MB) and decompression-bomb pixel density limit (`GRIEVANCE_MAX_PIXELS`).
+    - Pillow EXIF and GPS metadata stripping (100% removal of EXIF, GPS, and XMP tags), orientation transpose fix, LANCZOS downscaling to 1600px, and re-encoding to clean standard JPEG.
+    - Safe path and UUID validation with explicit citizen consent gate.
+  - Extend Curated Portal Registry (`app/models/portal.py` & `app/services/portal_registry.py`):
+    - Added `grievance_categories` and `coverage_area` fields to `PortalBase` and `PortalUpdateRequest`. Backward-compatible with Phase 12 portals.
+    - Updated `prt_tn_mudhalvar` with grievance categories and Tamil Nadu coverage area.
+    - Implemented `match_channels` ranking official channels (`kind in ('official', 'official_portal')`) with coverage area token overlap (Tamil and English script support). Falls back to static municipal redressal guidance if no official channels match.
+  - Extend `GeminiService.generate_structured` with optional multimodal `images` parameter (`types.Part.from_bytes`) with zero leakage of image bytes to logs.
+  - Implement Grievance Pipeline Engine (`app/services/grievance_service.py`):
+    - PII Guard verification on description, location, duration, and simulated notes.
+    - Prompt injection defense wrapping citizen input in boundary tags.
+    - Gemini structured analysis budgeted to 1 call per run (with in-memory SHA-256 analysis caching).
+    - Backend Fact & Integrity Verification: Strips ungrounded numbers/dates/measurements sentence-by-sentence using `extract_numbers_from_text`, strips URLs and contact numbers to `[link removed]` / `[contact removed]`, neutralizes aggressive threats or legal claims into formal respectful requests, inserts location verbatim, isolates photo observations until explicit citizen opt-in, and removes personal data requests from missing details.
+    - Rules-only fallback: On Gemini offline/failure, generates basic structured draft deterministically with working retry mechanism.
+    - Hash-bound approval and demo tracking: Computes SHA-256 hash over exact final text, category, severity, and location. Generates non-sequential `DEMO-XXXXXX` tracking ID. Forward-only simulated status progression (`registered` -> `under_review` -> `in_progress` -> `resolved`).
+  - Implement filesystem-backed `GrievanceStore` (`app/services/grievance_store.py`) with atomic JSON writes, thread safety, UUID path validation, background job tracking, and draft pruning rule (`GRIEVANCE_RECORDS_MAX`).
+  - Implement 11 REST API endpoints in `app/api/grievances.py`: `GET /capabilities`, `POST /image`, `POST /analyze`, `GET /{id}`, `POST /{id}/retry-analysis`, `PATCH /{id}`, `POST /{id}/register-demo`, `POST /{id}/demo-advance`, `GET /`, `DELETE /{id}`, `GET /image/{image_id}`.
+  - Promote Central Agent tools in `app/agent/tools.py` and `app/agent/orchestrator.py`:
+    - `draft_complaint`: Promoted to `available` (`read_only`), generating formal complaint draft and linking vetted official channels.
+    - `register_demo_complaint`: Added as `available` (`sensitive`, `requires_approval=True`), registering simulated DEMO complaint record bound to citizen approval and draft hash.
+    - Orchestrator intent derivation for `civic_complaint`, `grievances` list in `AgentResponse`, and human approval modal integration. Total: 9 available tools, 2 planned.
+  - Comprehensive unit and integration test suite (`tests/test_grievance.py`) with 25 unit/integration tests covering keyword classifier, safety rules, baseline severity floor, image validation & EXIF stripping, PII enforcement, portal matching, fact verification, fallback drafting, hash binding, demo tracking, and agent tools. Total backend test suite: 118 passing tests with zero failures.
+  - Build frontend services and hooks: `grievanceService.js`, `useGrievance.js` (with polling), `useGrievances.js`, and complete English and Tamil translations in `en.js` and `ta.js`.
+  - Build interactive Grievance Centre (`frontend/src/pages/Grievance.jsx`):
+    - Persistent amber demonstration banner ("Demonstration Environment Only: Complaints prepared here are tracked inside CivicLens to help you review, verify, and copy or print your representation before official submission. Nothing is sent to any government authority or third party.").
+    - Tab 1 ("New Complaint") with 4-step wizard:
+      - Step 1 (Describe): Problem description textarea with character counter (min 20, max 3000), PII notice, location and duration inputs, language toggle (EN/TA), category chips, quick example chips, photo dropzone with EXIF-stripped badge, and mandatory photo consent checkbox.
+      - Step 2 (Review & Edit): Prominent non-dismissable emergency hazard alert if `safety_risk`, category confirmation card, severity chip selector with safety floor enforcement, editable subject and body, location line, AI photo observations checklist with opt-in toggles, missing details hints with re-analyze modal, curated official reporting channels from registry, and copy/print actions.
+      - Step 3 (Authorize Demo): Review binding card displaying cryptographic SHA-256 draft hash, plain-language disclosure, and approval authorization.
+      - Step 4 (Tracking): Simulated status stepper (`registered` -> `under_review` -> `in_progress` -> `resolved`), reference ID (`DEMO-XXXXXX`), forward-only advance control with optional note input, simulated timeline, and delete button.
+    - Tab 2 ("My Complaints"): Filterable list of saved drafts and demo-registered complaints with quick open and delete actions. Supports direct `?id=...` deep linking.
+  - Integrate Grievance representations into `frontend/src/pages/Assistant.jsx` with summary cards, safety alert badges, and direct navigation into the Grievance Centre.
+- [x] **Phase 14: Playwright Browser Automation**
+  - Install and configure Playwright 1.40+ with Chromium headless browser in Python virtual environment (`playwright install chromium`).
+  - Add configuration settings in `app/core/config.py`: `BROWSER_ENABLED`, `BROWSER_HEADLESS`, `BROWSER_SLOW_MO_MS`, `BROWSER_SESSION_TTL_SECONDS`, `BROWSER_IDLE_CLOSE_SECONDS`, `BROWSER_MAX_ACTIONS_PER_SESSION`, `BROWSER_ACTION_TIMEOUT_MS`, `BROWSER_NAVIGATION_TIMEOUT_MS`, `BROWSER_VIEWPORT_WIDTH`, `BROWSER_VIEWPORT_HEIGHT`, `BROWSER_SCREENSHOT_MAX_WIDTH`, `BROWSER_SCREENSHOT_QUALITY`, `BROWSER_MAX_SCREENSHOTS_PER_SESSION`, `BROWSER_MAX_CONCURRENT_SESSIONS`, `BROWSER_RECORDS_MAX`, `BROWSER_RATE_LIMIT_PER_MINUTE`, `PUBLIC_BASE_URL`, and session directory `backend/data/browser_sessions`.
+  - Extend Portal Registry model (`app/models/portal.py`) with `system: bool = False`, allow HTTP loopback scheme strictly for local testing, protect system portals from modification (`SYSTEM_PORTAL_PROTECTED`), and automatically seed `prt_demo_portal`.
+  - Create browser error hierarchy in `app/core/errors.py`: `BrowserError`, `BrowserSessionNotFoundError`, `BrowserActionError`, `BrowserNavigationBlockedError`, `BrowserApprovalRequiredError`.
+  - Build declarative Demo Workflow Manifest (`demo_portal/manifest.json`) and responsive static demo portal (`demo_portal/public/index.html`, `style.css`, `app.js`):
+    - 5-step Income Certificate workflow (`step_1_applicant`, `step_2_address`, `step_3_income`, `step_4_purpose`, `step_5_review`).
+    - Fixed CSS `data-field` selectors, regex validators, help text, and fictional sample values in English and Tamil.
+    - Permanent DEMO banners, bilingual UI, step navigation, and receipt card.
+    - Zero external fonts or CDNs (100% self-contained).
+  - Mount `/demo-portal/` static directory and mock submission route `POST /demo-portal/submit` in `app/main.py`:
+    - Strict PII scanning rejecting sensitive identifiers.
+    - Simulates recording practice verification and returns non-sequential reference (`DEMO-IC-XXXXXX`).
+  - Implement Browser Automation Service (`app/services/browser_service.py`):
+    - Dedicated background OS worker thread (`BrowserWorker`) owning `sync_playwright()` and Chromium instance with thread-safe `queue.Queue`.
+    - Four-Layer Defense-in-Depth Model: Layer 1 Portal Registry Gate (loopback demo portal only), Layer 2 Network Interceptor (aborting all non-loopback requests), Layer 3 Navigation Assertions (verifying URL prefix before/after every action), Layer 4 Fixed Action Set (`open_portal`, `fill_step`, `go_next`, `go_back`, `go_to_review`, `read_back`, `submit`, `close`, `take_screenshot`).
+    - PII Guard (`ensure_no_pii`) on all values rejecting Aadhaar, PAN, phone, email, and long digit strings without value echoing.
+    - Canonical review SHA-256 hash calculation and verification before submission.
+    - Pillow JPEG downscaling (max width 900px, quality 70) with storage caps.
+    - Filesystem-backed session store with UUID validation and session pruning.
+  - Implement 11 REST API endpoints in `app/api/browser.py`: `GET /capabilities`, `GET /manifest`, `GET /sample-data`, `POST /sessions`, `GET /sessions`, `GET /sessions/{id}`, `POST /sessions/{id}/fill`, `POST /sessions/{id}/next`, `POST /sessions/{id}/back`, `POST /sessions/{id}/preview`, `POST /sessions/{id}/submit`, `POST /sessions/{id}/close`, `GET /sessions/{session_id}/screenshots/{screenshot_id}`.
+  - Promote Central Agent tools in `app/agent/tools.py` and `app/agent/orchestrator.py`:
+    - `open_service_portal`: Promoted to `available` (`sensitive`, `requires_approval=True`).
+    - `fill_demo_form`: Promoted to `available` (`sensitive`, `requires_approval=True`).
+    - `submit_demo_application`: Added as `available` (`sensitive`, `requires_approval=True`).
+    - Total: 12 available tools, 0 planned tools.
+    - Added `browser_demo` intent derivation and `browser_sessions` summary list in `AgentResponse`.
+  - Comprehensive unit and integration test suite (`tests/test_browser.py`) covering UUID validation, canonical SHA-256 hash verification, Layer 1 gate, PII guardrail, full 5-step lifecycle, mock submission, and agent approval flow. Full backend test suite: 139 passing tests with zero failures.
+  - Build frontend service `browserService.js`, stateful hook `useBrowserSession.js`, and chat hook integration in `useChat.js`.
+  - Update `Assistant.jsx` to display interactive browser demo cards with live viewport thumbnail, step badge, and direct jump to Demo Workflow.
+  - Build complete interactive Demo Workflow UI in Tab 4 of `frontend/src/pages/Services.jsx`:
+    - Educational simulation alert banner with loopback notice.
+    - Active session 5-step stepper with pass/current indicators.
+    - Dynamic step form fields with bilingual labels, help text, and "Fill Fictional Sample" button.
+    - Step 5 Review table with verified SHA-256 canonical hash badge and mandatory fictional data acknowledgment checkbox.
+    - Live Playwright Sandbox View with 1024x720 snapshot and clickable zoom modal.
+    - Automation Event Audit Log timeline.
+    - Submission success receipt card with `DEMO-IC-XXXXXX` reference and practice simulation metadata.
+    - Past practice sessions table.
+  - Complete English and Tamil translations in `frontend/src/utils/i18n/en.js` and `frontend/src/utils/i18n/ta.js`.
+- [x] **Phase 15: Database, History and Application Integration**
+  - Database Core & Migration Engine (`backend/app/db/`):
+    - Python standard library `sqlite3` only (no SQLAlchemy, zero external packages, zero ORM).
+    - Database manager (`database.py`) with thread-local connections, WAL mode (`PRAGMA journal_mode=WAL`), foreign keys (`PRAGMA foreign_keys=ON`), busy timeout (5000ms), and synchronous normal.
+    - Transaction context manager (`db.transaction()`) with atomic BEGIN IMMEDIATE, COMMIT on clean exit, and ROLLBACK on exception.
+    - Online hot backup using SQLite Backup API (`db.backup_to(dest_path)`).
+    - Database integrity checks (`db.integrity_check()`) and graceful degraded mode handling (`is_degraded`, `status`).
+    - Declarative migration runner (`runner.py`) applying versioned SQL migrations (`0001_init.sql`) with SHA-256 checksum tracking in `schema_migrations` and safety check against newer schema versions.
+  - 18 Unified Tables Provisioned in `backend/data/civiclens.db`:
+    - `schema_migrations`, `documents`, `document_pages`, `document_chunks`, `portals`, `comparisons`, `verifications`, `service_guides`, `form_field_explanations`, `grievances`, `browser_sessions`, `conversations`, `messages`, `tool_runs`, `approvals`, `activity`, `preferences`, `legacy_import`, `app_meta`.
+  - Swap-Ready SQLite Store Implementations (`backend/app/db/stores.py`):
+    - Replaced file-based stores with identical swap-ready interfaces: `SqliteDocumentStore`, `SqliteSourceLibraryStore`, `SqlitePortalRegistryStore`, `SqliteComparisonStore`, `SqliteVerificationStore`, `SqliteServiceGuideStore`, `SqliteGrievanceStore`, `SqliteBrowserSessionStore`.
+    - Binary assets remain on disk in their established directories (`uploads/`, `indexes/`, `official_sources/`, `grievances/`, `browser_sessions/`); database stores relative paths and structured metadata.
+  - History & Activity Ledgers:
+    - `tool_runs`: Audit history of tool calls with duration, status, and zero personal data (raw user arguments and document contents never logged).
+    - `approvals`: Citizen authorization ledger binding decision, bound review hash, and tool details.
+    - `activity`: System-wide activity ledger with read-time entity title resolution and `(deleted)` handling.
+  - Chat Conversation Persistence & Orchestrator Integration:
+    - Conversational data models (`models/conversations.py`) for conversations and messages.
+    - Central Agent Orchestrator automatically loads prior message history budget (up to 20 messages / 8,000 characters) when history payload is omitted, records tool runs and approvals into SQLite tables, and atomically persists user/assistant exchanges via `ConversationService.save_exchange`.
+    - Lazy auto-titling (~60 characters) based on the first citizen query.
+    - Full CRUD API endpoints in `app/api/conversations.py` and bulk import from browser localStorage (`POST /api/v1/conversations/import`).
+  - System Administration & Maintenance Endpoints (`app/api/system.py`):
+    - `GET /api/v1/system/status`: Reports database health, WAL size, and directory storage breakdown.
+    - `GET /api/v1/system/stats`: Aggregate counts across all 5 civic modules.
+    - `POST /api/v1/system/backup`: Online hot backup with automatic rolling rotation.
+    - `POST /api/v1/system/maintenance`: Fails interrupted comparison jobs older than 15 minutes, marks expired browser sessions, prunes activity records older than retention threshold, scans orphan files, and runs SQLite VACUUM/optimize.
+    - `DELETE /api/v1/system/data`: Prototype data wipe with mandatory `"DELETE MY DATA"` confirmation phrase.
+    - `GET /api/v1/activity`: Activity feed and `/api/v1/activity/tool-runs`.
+    - User Preferences endpoints (`app/api/preferences.py`) with allowlisted keys.
+  - Non-Destructive Legacy Importer (`app/db/legacy_importer.py`):
+    - Reads on-disk JSON metadata from Phase 7 through 14 stores without deleting or modifying disk files.
+  - Frontend Integration:
+    - `conversationService.js` and `systemService.js` API client modules.
+    - `useSystemStatus.js` hook for health, stats, backup, and maintenance operations.
+    - `RecentActivity.jsx` rewritten to consume live activity feed from `/api/v1/activity` with relative timestamps and module icons.
+    - `StorageManagementCard.jsx` on `/dashboard` with storage bar breakdown, SQLite WAL status badge, online backup trigger, maintenance modal, and "Delete my data" confirmation modal.
+    - `Dashboard.jsx` 4-card System Statistics Overview grid.
+    - `useChat.js` and `Assistant.jsx` updated to use backend SQLite conversation persistence with one-click localStorage migration banner.
+  - Complete bilingual localization across English and Tamil in `en.js` and `ta.js`.
+  - Comprehensive Test Suite:
+    - 28 new tests in `test_database.py`, `test_sqlite_stores.py`, `test_conversations.py`, `test_system.py`.
+    - Full regression test suite: **167 passed, 4 skipped, 0 failures across all 16 test files**.
+- [x] **Phase 16: Security, Testing and Final Integration**
+  - **Universal Citizen Privacy & PII Guardrail Enforcement**:
+    - Centralized PII detection engine (`app/core/pii_guard.py`) strictly enforced across all 5 modules, the Central AI Agent, and direct chatbot queries.
+    - Blocks Aadhaar (12-digit spaced and unspaced, with Verhoeff-like format checks), PAN cards (5 uppercase letters, 4 digits, 1 uppercase letter), Indian mobile phone numbers (+91, 10-digit mobile series), email addresses, and bank payment cards.
+    - Zero sensitive user values echoed in logs, error payloads, or database records (safe placeholder masking with `<redacted_*>`).
+    - PII False Positive Immunity: Verified that valid Indian government citations, dates (`YYYY-MM-DD`, `DD/MM/YYYY`), scheme identifiers (e.g. `G.O. Ms. No. 42`, `TN-EV-2023`), and currency values (`Rs. 2,50,000`, `₹ 50,00,000`, `1.2 lakh`, `crores`) pass cleanly without false positive rejections.
+  - **Prompt Injection Defense & Boundary Isolation**:
+    - All untrusted citizen inputs and external document passages wrapped with boundary tags (`wrap_untrusted_content`) with explicit XML-style markers and sanitization of user-supplied closing tags.
+    - Rigid system instructions forbidding prompt override, role changes, or outputting model-hallucinated portal links or phone contacts.
+  - **Path Traversal & Safe Filename Handling**:
+    - UUID-enforced identifier validation across documents, grievances, browser sessions, comparisons, and verifications.
+    - Display filenames sanitized by stripping directory separators (`/`, `\`), null bytes, and non-printable control characters.
+    - Grievance photo handling (`grievance_images.py`) strictly contained within `backend/data/grievances/` with regex pattern checking (`^[a-zA-Z0-9_\-]+$`) and `Path.is_relative_to` verification.
+  - **Secret & API Key Isolation**:
+    - Zero leakage of `GEMINI_API_KEY` across all public API endpoints (`/health`, `/info`, `/system/status`, `/system/stats`, `/gemini/status`, `/gemini/test`).
+    - API key value masked (`<masked-api-key>`) in diagnostics and excluded from SQLite persistence.
+  - **Rate Limiting & Burst Protection**:
+    - Rolling window rate limiters active across `/chat`, `/agent/chat`, `/documents/{id}/ask`, `/verify`, `/services/guide`, `/grievances/analyze`, `/browser/sessions/{id}/fill`.
+    - HTTP 429 Too Many Requests returned cleanly with user-friendly retry guidance.
+  - **Parameterized SQL Injection Immunity**:
+    - SQLite database accessed exclusively through parameterized queries (`?` placeholders).
+    - Zero raw SQL string interpolation or formatting across all stores and endpoints.
+    - Dedicated SQL injection payload tests (`' OR '1'='1`, `'; DROP TABLE documents; --`) verified with zero vulnerabilities.
+  - **End-to-End System Integration Test (`test_e2e_integration.py`)**:
+    - Complete cross-module citizen journey verified end-to-end:
+      1. Module 1: Upload gazette PDF -> extract & chunk -> grounded Q&A with verified citations.
+      2. Module 2: Policy comparison -> deterministic fact diff & change categorisation.
+      3. Module 3: Fact verification -> multi-source retrieval -> quote verification & verdict.
+      4. Module 4: Public service guidance -> requirements checklist & curated portal matching.
+      5. Module 4 Automation: Controlled browser simulation -> fictional form fill -> review hash.
+      6. Module 5: Civic grievance -> safety hazard classification -> complaint draft -> demo tracking.
+      7. Central Agent: Full 12-tool registry inspection & execution.
+      8. System Administration: Status check -> stats aggregation -> online hot backup -> automated maintenance run.
+  - **Full Regression & Final Security Test Suite**:
+    - **219 passed, 4 skipped, 0 failures across all 21 backend test files**.
+    - Red-team prompt injection suite (`backend/tests/redteam/test_redteam_injection.py`) passing.
+    - Privacy canaries suite (`backend/tests/test_privacy_canaries.py`) passing.
+    - Translation parity & linguistic quality suite (`backend/tests/test_language_parity.py`) passing (799/799 keys, 100% parity, 27,760+ Tamil characters).
+    - Quality evaluation benchmark harness (`backend/evals/runner.py`) passing with 100% score across all 5 civic modules.
+    - Automation scripts in `scripts/` (`check_env.ps1`, `start_all.ps1`, `stop_all.ps1`, `reset_demo.ps1`, `warm_demo.ps1`, `run_evals.ps1`) verified.
+    - Frontend production bundle cleanly built with zero errors (`npm run build --prefix frontend`).
+    - Release baseline recorded and verified for `v1.0.0-hackathon`.

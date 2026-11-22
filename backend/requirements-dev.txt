@@ -1,0 +1,5 @@
+# Testing framework for Python
+pytest>=8.0.0
+
+# HTTP client library required by FastAPI TestClient and test assertions
+httpx>=0.27.0
