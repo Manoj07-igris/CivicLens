@@ -62,6 +62,7 @@ class AuthResponse(BaseModel):
 
   user: UserResponse = Field(..., description="Authenticated user profile")
   csrf_token: str = Field(..., description="Stateless CSRF synchronizer token for subsequent write requests")
+  token: Optional[str] = Field(default=None, description="Session bearer token for cross-origin environments")
 
 
 class ChangePasswordRequest(BaseModel):

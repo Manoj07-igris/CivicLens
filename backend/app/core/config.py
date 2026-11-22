@@ -1,7 +1,7 @@
 import os
 from functools import lru_cache
 from pathlib import Path
-from typing import List
+from typing import List, Optional
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 # Determine base directory of backend
@@ -130,7 +130,8 @@ class Settings(BaseSettings):
   ADMIN_EMAILS: str = ""
   AUTH_ALLOW_REGISTRATION: bool = True
   AUTH_COOKIE_NAME: str = "civiclens_session"
-  AUTH_COOKIE_SECURE: bool = False
+  AUTH_COOKIE_SECURE: Optional[bool] = None
+  AUTH_COOKIE_SAMESITE: Optional[str] = None
   AUTH_SESSION_IDLE_MINUTES: int = 120
   AUTH_SESSION_ABSOLUTE_HOURS: int = 12
   AUTH_REMEMBER_ME_IDLE_DAYS: int = 7
@@ -354,7 +355,19 @@ class Settings(BaseSettings):
     return self.AUTH_HASH_CONCURRENCY
 
   @property
-  def AUTH_COOKIE_SAMESITE(self) -> str:
+  def is_auth_cookie_secure(self) -> bool:
+    if self.AUTH_COOKIE_SECURE is not None:
+      return self.AUTH_COOKIE_SECURE
+    if self.FRONTEND_BASE_URL.startswith("https://") or self.APP_ENV == "production":
+      return True
+    return False
+
+  @property
+  def auth_cookie_samesite(self) -> str:
+    if self.AUTH_COOKIE_SAMESITE and self.AUTH_COOKIE_SAMESITE.strip():
+      return self.AUTH_COOKIE_SAMESITE.strip().lower()
+    if self.FRONTEND_BASE_URL.startswith("https://") or self.APP_ENV == "production":
+      return "none"
     return "lax"
 
   @property

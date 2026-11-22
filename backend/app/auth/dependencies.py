@@ -59,6 +59,10 @@ async def get_current_user(
   """
   settings = get_settings()
   raw_token = request.cookies.get(settings.AUTH_COOKIE_NAME)
+  if not raw_token:
+    auth_header = request.headers.get("authorization")
+    if auth_header and auth_header.startswith("Bearer "):
+      raw_token = auth_header[7:].strip()
 
   if not raw_token:
     raise AuthenticationRequiredError("Authentication required. Please log in.")
@@ -104,6 +108,10 @@ async def get_optional_current_user(
   """Extract current user if authenticated session cookie is valid, or None without raising error."""
   settings = get_settings()
   raw_token = request.cookies.get(settings.AUTH_COOKIE_NAME)
+  if not raw_token:
+    auth_header = request.headers.get("authorization")
+    if auth_header and auth_header.startswith("Bearer "):
+      raw_token = auth_header[7:].strip()
   if not raw_token:
     return None
 

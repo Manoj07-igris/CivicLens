@@ -18,6 +18,26 @@ const DEFAULT_TIMEOUT_MS = 15000;
 
 // In-memory CSRF token storage (never stored in localStorage or cookies)
 let _csrfToken = null;
+let _authToken = null;
+
+try {
+  _authToken = sessionStorage.getItem("civiclens_auth_token") || null;
+} catch (e) {
+  _authToken = null;
+}
+
+export const setAuthToken = (token) => {
+  _authToken = token || null;
+  try {
+    if (token) {
+      sessionStorage.setItem("civiclens_auth_token", token);
+    } else {
+      sessionStorage.removeItem("civiclens_auth_token");
+    }
+  } catch (e) {}
+};
+
+export const getAuthToken = () => _authToken;
 
 export const setCsrfToken = (token) => {
   _csrfToken = token || null;
@@ -35,6 +55,7 @@ export const onUnauthorized = (listener) => {
 
 export const notifyUnauthorized = () => {
   _csrfToken = null;
+  setAuthToken(null);
   _unauthorizedListeners.forEach((listener) => {
     try {
       listener();
@@ -76,6 +97,10 @@ async function request(endpoint, options = {}) {
   const defaultHeaders = {
     Accept: "application/json",
   };
+
+  if (_authToken) {
+    defaultHeaders["Authorization"] = `Bearer ${_authToken}`;
+  }
 
   // Only set Content-Type to JSON if body is not FormData
   if (!(fetchOptions.body instanceof FormData)) {
@@ -182,6 +207,14 @@ export const apiClient = {
 
   getCsrfToken() {
     return getCsrfToken();
+  },
+
+  setAuthToken(token) {
+    setAuthToken(token);
+  },
+
+  getAuthToken() {
+    return getAuthToken();
   },
 
   onUnauthorized(listener) {

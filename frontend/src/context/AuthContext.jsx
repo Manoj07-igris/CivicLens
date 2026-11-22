@@ -14,6 +14,7 @@ export function AuthProvider({ children }) {
     setStatus("anonymous");
     setCsrfTokenState(null);
     apiClient.setCsrfToken(null);
+    apiClient.setAuthToken(null);
   }, []);
 
   const refreshUser = useCallback(async () => {
@@ -22,6 +23,9 @@ export function AuthProvider({ children }) {
       if (data && data.user) {
         setUser(data.user);
         setStatus("authenticated");
+        if (data.token) {
+          apiClient.setAuthToken(data.token);
+        }
         if (data.csrf_token) {
           setCsrfTokenState(data.csrf_token);
           apiClient.setCsrfToken(data.csrf_token);
@@ -58,6 +62,9 @@ export function AuthProvider({ children }) {
         if (meData.status === "fulfilled" && meData.value && meData.value.user) {
           setUser(meData.value.user);
           setStatus("authenticated");
+          if (meData.value.token) {
+            apiClient.setAuthToken(meData.value.token);
+          }
           if (meData.value.csrf_token) {
             setCsrfTokenState(meData.value.csrf_token);
             apiClient.setCsrfToken(meData.value.csrf_token);
@@ -91,6 +98,9 @@ export function AuthProvider({ children }) {
     if (data && data.user) {
       setUser(data.user);
       setStatus("authenticated");
+      if (data.token) {
+        apiClient.setAuthToken(data.token);
+      }
       if (data.csrf_token) {
         setCsrfTokenState(data.csrf_token);
         apiClient.setCsrfToken(data.csrf_token);
@@ -104,6 +114,9 @@ export function AuthProvider({ children }) {
     if (data && data.user) {
       setUser(data.user);
       setStatus("authenticated");
+      if (data.token) {
+        apiClient.setAuthToken(data.token);
+      }
       if (data.csrf_token) {
         setCsrfTokenState(data.csrf_token);
         apiClient.setCsrfToken(data.csrf_token);

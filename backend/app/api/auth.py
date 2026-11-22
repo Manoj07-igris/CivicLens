@@ -48,8 +48,8 @@ def _set_auth_cookie(response: Response, raw_token: str, remember_me: bool = Fal
       value=raw_token,
       max_age=max_age,
       httponly=True,
-      samesite=settings.AUTH_COOKIE_SAMESITE,
-      secure=settings.AUTH_COOKIE_SECURE,
+      samesite=settings.auth_cookie_samesite,
+      secure=settings.is_auth_cookie_secure,
       path="/",
   )
 
@@ -59,6 +59,9 @@ def _clear_auth_cookie(response: Response) -> None:
   response.delete_cookie(
       key=settings.AUTH_COOKIE_NAME,
       path="/",
+      httponly=True,
+      samesite=settings.auth_cookie_samesite,
+      secure=settings.is_auth_cookie_secure,
   )
 
 
@@ -92,7 +95,7 @@ async def register(
       user_agent=user_agent,
   )
   _set_auth_cookie(response, raw_token, remember_me=False)
-  return AuthResponse(user=user, csrf_token=csrf_token)
+  return AuthResponse(user=user, csrf_token=csrf_token, token=raw_token)
 
 
 @router.post("/login", response_model=AuthResponse)
@@ -112,7 +115,7 @@ async def login(
       user_agent=user_agent,
   )
   _set_auth_cookie(response, raw_token, remember_me=payload.remember_me)
-  return AuthResponse(user=user, csrf_token=csrf_token)
+  return AuthResponse(user=user, csrf_token=csrf_token, token=raw_token)
 
 
 @router.post("/logout", response_model=MessageResponse)
@@ -161,7 +164,7 @@ async def get_current_user_profile(
       updated_at="",
       preferred_language=current_user.preferred_language,
   )
-  return AuthResponse(user=user_resp, csrf_token=fresh_csrf)
+  return AuthResponse(user=user_resp, csrf_token=fresh_csrf, token=current_user.raw_token)
 
 
 @router.patch("/me", response_model=UserResponse)
