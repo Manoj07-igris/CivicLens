@@ -184,8 +184,12 @@ class GeminiService:
     if genai is None:
       raise GeminiAPIError("google-genai SDK is not installed in the environment.")
 
-    # Never log the key or print it
-    self._client = genai.Client(api_key=self._settings.clean_gemini_api_key)
+    # Never log the key or print it; explicitly use v1beta for developer system instructions & tools
+    http_opts = types.HttpOptions(api_version="v1beta") if types is not None else {"api_version": "v1beta"}
+    self._client = genai.Client(
+        api_key=self._settings.clean_gemini_api_key,
+        http_options=http_opts,
+    )
     return self._client
 
   def _format_contents(
