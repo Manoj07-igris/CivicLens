@@ -292,13 +292,21 @@ class Settings(BaseSettings):
     ]
 
   @property
+  def clean_gemini_api_key(self) -> str:
+    """Return sanitized Gemini API key stripped of whitespace and enclosing quotes."""
+    key = (self.GEMINI_API_KEY or "").strip()
+    if (key.startswith('"') and key.endswith('"')) or (key.startswith("'") and key.endswith("'")):
+      key = key[1:-1].strip()
+    return key
+
+  @property
   def is_gemini_configured(self) -> bool:
     """Return True if a non-placeholder Gemini API key is configured.
 
     Never exposes the raw key.
     """
-    key = self.GEMINI_API_KEY.strip()
-    return bool(key and key != "your_key_here")
+    key = self.clean_gemini_api_key
+    return bool(key and key not in ("your_key_here", "your_api_key_here", "your_gemini_api_key", "your_gemini_api_key_here", "your_api_key"))
 
   # Phase 13 ergonomic accessors
   @property

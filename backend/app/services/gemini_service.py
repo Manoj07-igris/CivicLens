@@ -185,7 +185,7 @@ class GeminiService:
       raise GeminiAPIError("google-genai SDK is not installed in the environment.")
 
     # Never log the key or print it
-    self._client = genai.Client(api_key=self._settings.GEMINI_API_KEY.strip())
+    self._client = genai.Client(api_key=self._settings.clean_gemini_api_key)
     return self._client
 
   def _format_contents(
@@ -335,7 +335,9 @@ class GeminiService:
           last_error = GeminiAPIError("Gemini server error. Retrying...")
         else:
           # Non-retriable client errors (400, 403, etc.)
-          raise GeminiAPIError(f"Gemini API request failed with code {code}.") from exc
+          err_msg = getattr(exc, "message", "") or str(exc)
+          clean_msg = " ".join(err_msg.splitlines())[:200]
+          raise GeminiAPIError(f"Gemini API request failed with code {code}: {clean_msg}") from exc
       except GeminiSafetyBlockedError:
         raise
       except Exception as exc:
@@ -589,7 +591,9 @@ class GeminiService:
             last_error = GeminiAPIError(f"Gemini service unavailable ({code}).")
             logger.warning("Transient Gemini error %d in generate_with_tools on attempt %d/%d", code, attempt + 1, max_retries + 1)
           else:
-            raise GeminiAPIError(f"Gemini API request failed with code {code}.") from exc
+            err_msg = getattr(exc, "message", "") or str(exc)
+            clean_msg = " ".join(err_msg.splitlines())[:200]
+            raise GeminiAPIError(f"Gemini API request failed with code {code}: {clean_msg}") from exc
       except GeminiSafetyBlockedError:
         raise
       except Exception as exc:
