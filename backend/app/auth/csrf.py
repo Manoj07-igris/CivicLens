@@ -6,7 +6,7 @@ import logging
 from typing import List, Optional
 from urllib.parse import urlparse
 
-from app.core.config import get_settings
+from app.core.config import Settings, get_settings
 
 logger = logging.getLogger("civiclens.auth.csrf")
 
@@ -44,13 +44,18 @@ def normalize_origin(url_str: str) -> str:
     return ""
 
 
-def verify_origin(origin_header: Optional[str], referer_header: Optional[str]) -> bool:
+def verify_origin(
+    origin_header: Optional[str],
+    referer_header: Optional[str],
+    settings: Optional[Settings] = None,
+) -> bool:
   """Validate request Origin or Referer against configured allowed frontend origins."""
-  settings = get_settings()
+  if settings is None:
+    settings = get_settings()
 
   # Build complete set of valid origins
   allowed_set = set()
-  for orig in settings.CORS_ORIGINS:
+  for orig in settings.cors_origins_list:
     norm = normalize_origin(orig)
     if norm:
       allowed_set.add(norm.lower())

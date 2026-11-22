@@ -272,11 +272,12 @@ class Settings(BaseSettings):
     """Parse comma-separated CORS_ORIGINS string into a clean list of origins."""
     if not self.CORS_ORIGINS:
       return ["http://localhost:5173", "http://127.0.0.1:5173"]
-    return [
-        origin.strip()
-        for origin in self.CORS_ORIGINS.split(",")
-        if origin.strip()
-    ]
+    origins = []
+    for origin in self.CORS_ORIGINS.split(","):
+      cleaned = origin.strip().rstrip("/")
+      if cleaned:
+        origins.append(cleaned)
+    return origins
 
   @property
   def allowed_hosts_list(self) -> List[str]:
